@@ -60,11 +60,11 @@ class Graf:
 
     def bfs(self, start, end, verbose=False):
         """Use external BFS implementation"""
-        return bfs(self.graph, start, end, verbose, wait_for_user)
+        return bfs(self.graph, start, end, verbose)
 
     def dfs(self, start, end, verbose=False):
         """Use external DFS implementation"""
-        return dfs(self.graph, start, end, verbose=verbose, wait_for_user=wait_for_user)
+        return dfs(self.graph, start, end, verbose=verbose)
 
     def display(self, path=None, show_weights=True):
         """Basic display method for compatibility"""

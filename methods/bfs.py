@@ -13,7 +13,7 @@ def bfs(graph, start, end, verbose=False):
     """
     if start not in graph.nodes() or end not in graph.nodes():
         print(f"Start node '{start}' or end node '{end}' not in graph")
-        return None, None, None
+        return None, None, None 
     
     if start == end:
         print(f"Start and end are the same: {start}")
