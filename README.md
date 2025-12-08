@@ -40,6 +40,11 @@ Below are available methods based on their order from the program.
 ![](./png/directed_weighted.png)
 
 3. Dijkstra's Algorithm
+```txt
+Choose output type (1-3): 2
+Shortest path from A to E: A -> B -> E
+Total distance: 6
+```
 
 ### Additional Methods
 This can be accessed when `4. Additional Methods` (typing 4 on the terminal) is selected and shows 3 additional methods 

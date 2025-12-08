@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 from methods.dijkstra import dijkstra, dijkstra_with_table
 from methods.bfs import bfs
 from methods.dfs import dfs
+from methods.degree import show_graph_degree, show_all_analytics
+
+def wait_for_user():
+    input("\nPress 'Enter' to continue...")
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -115,146 +119,7 @@ class Graf:
         plt.title(f"{graph_type} Graph", fontsize=16, fontweight='bold')
         
         plt.show()
-
-    # 
-    def interactive_visualize(self):
-        """Interactive visualization with user choices"""
-        print("\nVisualization Options:")
-        print("1. Basic graph")
-        print("2. Graph with different layout")
-        print("3. Graph with custom colors")
-        print("4. Graph comparison (multiple layouts)")
-        
-        viz_choice = input("Choose visualization option (1-4): ")
-        
-        match viz_choice:
-            case '1':
-                self.visualize(title="Basic Graph Visualization")
-            
-            case '2':
-                print("Layout options: spring, circular, random, shell")
-                layout = input("Choose layout: ").lower()
-                if layout in ['spring', 'circular', 'random', 'shell']:
-                    self.advanced_visualize(layout=layout, title=f"{layout.title()} Layout")
-                else:
-                    print("Invalid layout. Using spring layout.")
-                    self.visualize()
-            
-            case '3':
-                print("Available colors: red, blue, green, yellow, purple, orange, pink")
-                color = input("Choose node color: ").lower()
-                colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink']
-                if color in colors:
-                    self.advanced_visualize(normal_color=color, title=f"Graph with {color.title()} Nodes")
-                else:
-                    print("Invalid color. Using default.")
-                    self.visualize()
-            
-            case '4':
-                # Show multiple layouts in subplots
-                fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-                fig.suptitle("Graph Layout Comparison", fontsize=16)
-                
-                layouts = ['spring', 'circular', 'random', 'shell']
-                for i, layout in enumerate(layouts):
-                    ax = axes[i//2, i%2]
-                    plt.sca(ax)
-                    
-                    pos = getattr(nx, f"{layout}_layout")(self.graph)
-                    nx.draw(self.graph, pos, with_labels=True, 
-                           node_color='lightblue', node_size=300, 
-                           font_size=10, ax=ax)
-                    
-                    if self.graph.edges():
-                        edge_labels = nx.get_edge_attributes(self.graph, 'weight')
-                        if edge_labels:
-                            nx.draw_networkx_edge_labels(self.graph, pos, 
-                                                       edge_labels=edge_labels, 
-                                                       font_size=8, ax=ax)
-                    
-                    ax.set_title(f"{layout.title()} Layout")
-                    ax.axis('off')
-                
-                plt.tight_layout()
-                plt.show()
-            
-            case _:
-                print("Invalid choice. Showing basic visualization.")
-                self.visualize()
-
-    def advanced_visualize(self, path=None, show_weights=True, layout='spring', node_size=500, 
-                          path_color='red', normal_color='lightblue', title=None):
-        """
-        Enhanced visualization method with more customization options
-        """
-        # Choose layout
-        layout_options = {
-            'spring': nx.spring_layout,
-            'circular': nx.circular_layout,
-            'random': nx.random_layout,
-            'shell': nx.shell_layout
-        }
-        
-        pos = layout_options.get(layout, nx.spring_layout)(self.graph)
-        
-        # Set up the plot
-        plt.figure(figsize=(10, 8))
-        
-        # Default colors
-        node_colors = [normal_color] * len(self.graph.nodes())
-        edge_colors = ['black'] * len(self.graph.edges())
-        edge_widths = [1] * len(self.graph.edges())
-        
-        # Highlight path if provided
-        if path:
-            # Highlight path nodes
-            for node in path:
-                if node in self.graph.nodes():
-                    node_index = list(self.graph.nodes()).index(node)
-                    node_colors[node_index] = path_color
-            
-            # Highlight path edges
-            path_edges = [(path[i], path[i+1]) for i in range(len(path)-1)]
-            for edge in path_edges:
-                if edge in self.graph.edges():
-                    edge_index = list(self.graph.edges()).index(edge)
-                    edge_colors[edge_index] = path_color
-                    edge_widths[edge_index] = 3
-                elif (edge[1], edge[0]) in self.graph.edges():
-                    edge_index = list(self.graph.edges()).index((edge[1], edge[0]))
-                    edge_colors[edge_index] = path_color
-                    edge_widths[edge_index] = 3
-        
-        # Draw the graph
-        nx.draw(self.graph, pos, 
-                with_labels=True, 
-                node_color=node_colors,
-                edge_color=edge_colors, 
-                node_size=node_size, 
-                font_size=14, 
-                font_weight='bold', 
-                width=edge_widths,
-                font_color='black')
-        
-        # Draw edge labels with weights
-        if show_weights:
-            edge_labels = nx.get_edge_attributes(self.graph, 'weight')
-            if edge_labels:  # Only if weights exist
-                nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels,
-                                           font_size=10, font_color='blue')
-        
-        # Add title
-        if title:
-            plt.title(title, fontsize=16, fontweight='bold')
-        elif path:
-            plt.title(f"Path: {' → '.join(path)}", fontsize=14, fontweight='bold')
-        else:
-            plt.title("Graph Visualization", fontsize=14, fontweight='bold')
-        
-        plt.axis('off')  # Hide axes
-        plt.tight_layout()
-        plt.show()
-
+    
 def handle_pathfinding_choice(g, algorithm_method, algorithm_name):
     """Helper function to handle pathfinding choices"""
     start = input("Enter start node: ").upper()
@@ -290,12 +155,12 @@ def handle_pathfinding_choice(g, algorithm_method, algorithm_name):
 def show_additional_methods_menu(g):
     """Show sub-menu for additional methods"""
     while True:
-        print("\n--- Additional Methods ---")
+        clear_screen()
+        print("--- Additional Methods ---")
         print("1. BFS (Breadth-First Search)")
         print("2. DFS (Depth-First Search)")
         print("3. Dijkstra with Table")
-        print("4. Advanced Visualization Options")
-        print("5. Back to Main Menu")
+        print("4. Back to Main Menu")
         
         sub_choice = input("Enter your choice (1-5): ")
         
@@ -303,24 +168,22 @@ def show_additional_methods_menu(g):
             case '1':
                 clear_screen()
                 handle_pathfinding_choice(g, g.bfs, "BFS")
-            
+                wait_for_user()
+
             case '2':
                 clear_screen()
                 handle_pathfinding_choice(g, g.dfs, "DFS")
-            
+                wait_for_user()
+
             case '3':
                 clear_screen()
                 handle_pathfinding_choice(g, g.dijkstra_with_table, "Dijkstra with table")
-            
+                wait_for_user()
+
             case '4':
-                g.interactive_visualize()
-            
-            case '5':
+                clear_screen()
                 break
             
-            case _:
-                print("Invalid choice! Please try again.")
-
 def create_undirected_graph():
     """Create sample undirected graph"""
     g = Graf(directed=False)
@@ -329,15 +192,18 @@ def create_undirected_graph():
     g.add_node('C')
     g.add_node('D')
     g.add_node('E')
+    g.add_node('F')
+    g.add_node('G')
 
     # Add edges with weights
-    g.add_edge('A', 'B', weight=1)
-    g.add_edge('A', 'C', weight=4)
-    g.add_edge('B', 'C', weight=2)
-    g.add_edge('B', 'E', weight=5)
-    g.add_edge('B', 'D', weight=3)
-    g.add_edge('C', 'D', weight=1)
-    g.add_edge('D', 'E', weight=2)
+    g.add_edge('A', 'B', weight=2)
+    g.add_edge('A', 'C', weight=5)
+    g.add_edge('B', 'D', weight=4)
+    g.add_edge('B', 'E', weight=6)
+    g.add_edge('C', 'F', weight=3)
+    g.add_edge('D', 'G', weight=2)
+    g.add_edge('E', 'F', weight=4)
+    g.add_edge('F', 'G', weight=1)
     
     return g
 
@@ -349,15 +215,15 @@ def create_directed_graph():
     g.add_node('C')
     g.add_node('D')
     g.add_node('E')
+    g.add_node('F')
 
-    # Add directed edges with weights
-    g.add_directed_edge('A', 'B', weight=1)
-    g.add_directed_edge('A', 'C', weight=4)
-    g.add_directed_edge('B', 'C', weight=2)
-    g.add_directed_edge('C', 'D', weight=1)
-    g.add_directed_edge('B', 'D', weight=3)
-    g.add_directed_edge('D', 'E', weight=2)
-    g.add_directed_edge('E', 'A', weight=6)  # Creates a cycle
+    g.add_directed_edge('A', 'B')
+    g.add_directed_edge('A', 'C')
+    g.add_directed_edge('B', 'D')
+    g.add_directed_edge('C', 'E')
+    g.add_directed_edge('C', 'F')
+    g.add_directed_edge('D', 'E')
+    g.add_directed_edge('E', 'F')  # Creates a cycle
     
     return g
 
@@ -386,15 +252,16 @@ if __name__ == "__main__":
     while True:
         # Main menu
         graph_type = "Directed" if g.is_directed else "Undirected"
-        print(f"\n=== {graph_type.upper()} GRAPH ANALYSIS MENU ===")
+        print(f"=== {graph_type.upper()} GRAPH ANALYSIS MENU ===")
         print("1. Display Graph (basic)")
         print("2. Display Weighted Graph")
         print("3. Find Shortest Path (Dijkstra)")
-        print("4. Additional Methods")
-        print("5. Switch Graph Type")
-        print("6. Exit")
+        print("4. Additional Methods (BFS, DFS, etc.)")
+        print("5. Show Graph Analytics")
+        print("6. Switch Graph Type")
+        print("7. Exit")
         
-        choice = input("Enter your choice (1-6): ")
+        choice = input("Enter your choice (1-7): ")
         
         match choice:
             case '1':
@@ -409,9 +276,15 @@ if __name__ == "__main__":
                 handle_pathfinding_choice(g, g.dijkstra, "Dijkstra")
             
             case '4':
+                clear_screen()
                 show_additional_methods_menu(g)
-            
+
             case '5':
+                clear_screen()
+                show_all_analytics(g.graph)
+                wait_for_user()
+            
+            case '6':
                 print("=== GRAPH SELECTION ===")
                 print("1. Undirected Graph")
                 print("2. Directed Graph")
@@ -428,7 +301,7 @@ if __name__ == "__main__":
                     case _:
                         print("Invalid choice. Keeping current graph.")
             
-            case '6':
+            case '7':
                 print("Goodbye!")
                 break
             
